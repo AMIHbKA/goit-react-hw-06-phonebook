@@ -1,26 +1,13 @@
-import PropTypes from 'prop-types';
 import { List } from './ContactsList.styled';
-import { useSelector, useDispatch } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { ListItem } from './ListItem';
+import { selectFilteredContactsIds } from 'redux/features';
 
 export const ContactsList = () => {
-  const contacts = useSelector(state => state.contacts);
-  const dispatch = useDispatch();
+  const contactIds = useSelector(selectFilteredContactsIds);
+  const renderedListItems = contactIds.map(contactId => {
+    return <ListItem id={contactId} key={contactId} />;
+  });
 
-  return (
-    <List>
-      <ListItem id={1} key={1} />
-    </List>
-  );
+  return <List>{renderedListItems}</List>;
 };
-
-// ContactsList.propTypes = {
-//   contacts: PropTypes.arrayOf(
-//     PropTypes.shape({
-//       id: PropTypes.string.isRequired,
-//       name: PropTypes.string.isRequired,
-//       number: PropTypes.string.isRequired,
-//     })
-//   ),
-//   onDelete: PropTypes.func.isRequired,
-// };

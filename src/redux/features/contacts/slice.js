@@ -1,37 +1,51 @@
-import { createSlice } from '@reduxjs/toolkit';
+import {
+  createSlice,
+  createEntityAdapter,
+  createSelector,
+} from '@reduxjs/toolkit';
 
-const selectAllContacts = state => state.contacts;
+const contactsAdapter = createEntityAdapter();
 
-export const selectContactById = (state, contactId) => {
-  return selectAllContacts(state)[contactId];
-};
+const initialState = contactsAdapter.getInitialState();
 
 export const contactsSlice = createSlice({
   name: 'contacts',
-  initialState: [
-    { id: 1, name: 'Mango', number: '123-548-879' },
-    { id: 2, name: 'Avocado', number: '323-548-879' },
-  ],
+  initialState,
   reducers: {
     addContact: (state, action) => {
       const contactToAdd = action.payload;
-      const contactExists = state.find(
+      const contactExists = Object.values(state.entities).find(
         ({ name, number }) =>
           name === contactToAdd.name || number === contactToAdd.number
       );
 
       if (!contactExists) {
-        state.push(action.payload);
+        contactsAdapter.addOne(state, action.payload);
       } else {
         alert('This contact is already added');
       }
     },
-  },
-
-  deleteContact: (state, action) => {
-    console.log(state);
-    // state.filter(({ id }) => id !== action.payload);
+    deleteContact: contactsAdapter.removeOne,
   },
 });
 
 export const { addContact, deleteContact } = contactsSlice.actions;
+
+export const { selectAll: selectContacts, selectById: selectContactById } =
+  contactsAdapter.getSelectors(state => state.contacts);
+
+export const selectContactIds = createSelector(selectContacts, contacts =>
+  contacts.map(contact => contact.id)
+);
+
+export const selectFilteredContactsIds = createSelector(
+  [selectContacts, state => state.filter],
+  (contacts, filter) =>
+    contacts
+      .filter(
+        contact =>
+          contact.name.toLowerCase().includes(filter.toLowerCase()) ||
+          contact.number.toLowerCase().includes(filter.toLowerCase())
+      )
+      .map(contact => contact.id)
+);

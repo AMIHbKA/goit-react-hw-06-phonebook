@@ -8,7 +8,7 @@ import {
   Field,
 } from './ContactForm.styled';
 import * as Yup from 'yup';
-import { useSelector, useDispatch } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { addContact } from 'redux/features/index';
 
 const ContactsSchema = Yup.object().shape({
